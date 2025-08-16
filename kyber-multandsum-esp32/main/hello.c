@@ -50,7 +50,6 @@ void matrix_vector_multiply(polyvec *result, polyvec A[KYBER_K], polyvec *s) {
     printf("Starting matrix-vector multiplication A * s...\n");
     
     for (int i = 0; i < KYBER_K; i++) {
-        // result[i] = A[i] · s (dot product of row i with vector s)
         polyvec_basemul_acc_montgomery(&result->vec[i], &A[i], s);
         
         printf("Computed result row %d\n", i);
@@ -79,14 +78,14 @@ void app_main(void) {
     printf("Matrix generation seed: ");
     for (int i = 0; i < 32; i++) printf("%02X", seed[i]);
     printf("\n\n");
-    
-    // Step 1: Generate matrix A
+
+    //  Generate matrix 
     printf("=== Step 1: Generating matrix A ===\n");
     gen_matrix(A, seed, 0);
     printf("Matrix A generated successfully\n\n");
     
-    // Step 2: Generate noise vectors s and e
-    printf("=== Step 2: Generating noise vectors s and e ===\n");
+    // Generate noise vectors
+    printf("Generating noise vectors s and e \n");
     
     // Generate s vector
     for (int i = 0; i < KYBER_K; i++) {
@@ -106,7 +105,7 @@ void app_main(void) {
     print_polyvec_summary("s (NTT domain)", &s, 8);
     print_polyvec_summary("e (time domain)", &e, 8);
     
-    // Step 3: Matrix-vector multiplication A * s
+    //  Matrix-vector multiplication A * s
     printf("=== Step 3: Computing A * s ===\n");
     matrix_vector_multiply(&As, A, &s);
     
@@ -116,14 +115,14 @@ void app_main(void) {
     }
     print_polyvec_summary("A*s (time domain)", &As, 8);
     
-    // Step 4: Compute t = A*s + e (using built-in function)
-    printf("=== Step 4: Computing t = A*s + e ===\n");
+    //  Compute t = A*s + e 
+    printf(" Computing t = A*s + e \n");
     polyvec_add(&t, &As, &e);  // Use the built-in function with const parameters
     
     print_polyvec_summary("t = A*s + e", &t, 8);
     
-    // Step 5: Reduce coefficients modulo q
-    printf("=== Step 5: Reducing t modulo q ===\n");
+    // Reduce coefficients modulo q
+    printf(" Reducing t modulo q \n");
     polyvec_reduce(&t);
     
     print_polyvec_summary("t (reduced mod q)", &t, 8);
@@ -132,7 +131,7 @@ void app_main(void) {
     ESP_LOGI(TAG, "Public key would be: (t, rho)");
     ESP_LOGI(TAG, "Private key would be: s");
     
-    // Memory usage info
+    // Memory  info
     size_t free_heap = esp_get_free_heap_size();
     ESP_LOGI(TAG, "Free heap memory: %zu bytes", free_heap);
     
